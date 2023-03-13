@@ -10,6 +10,28 @@ from nhl_api.info import TeamInfo
             - The players number, name and the team abbrev badge.
 """
 
+# TODO: use a config option
+SHOW_TYPE = True
+
+PenaltyNameDict = {
+    "Boarding": "BOARD",
+    "Cross-checking": "CRS CHK",
+    "Delaying Game - Puck over glass": "DLY OF GM",
+    "Missing key [PD_151]": "FAIL CHLG", # Failed challenge Delay of Game
+    "Fighting": "FIGHT",
+    "High-sticking": "HIGH STK",
+    "Holding": "HOLD",
+    "Holding the stick": "HOLD STK",
+    "Hooking": "HOOK",
+    "Interference": "INT",
+    "Illegal check to head": "HEAD CHK",
+    "Roughing": "ROUGH",
+    "Roughing - Removing opponent's helmet": "ROUGH",
+    "Slashing": "SLASH",
+    "Too many men on the ice": "T.M.M.",
+    "Tripping": "TRIP"
+}
+
 class PenaltyRenderer:
     def __init__(self, data, matrix, sleepEvent, team):
         penalty_details = team.penalties[-1] # Get the last goal of the list of plays
@@ -20,6 +42,7 @@ class PenaltyRenderer:
         self.periodTime = penalty_details.periodTime
         self.penaltyMinutes = penalty_details.penaltyMinutes # TODO: I don't know if we have this
         self.severity = penalty_details.severity
+        self.penaltyType = penalty_details.penaltyType
         self.rotation_rate = 10
         self.matrix = matrix
         self.font = data.config.layout.font
@@ -73,11 +96,22 @@ class PenaltyRenderer:
             self.layout.minutes, 
             "{}:00".format(self.penaltyMinutes),
         )
-        self.matrix.draw_text_layout(
-            self.layout.severity, 
-            self.severity, 
-            fillColor=(255,195,12),
-        )
+
+        if SHOW_TYPE:
+            typeStr = PenaltyNameDict.get(self.penaltyType)
+            if typeStr == None:
+                typeStr = self.penaltyType
+            self.matrix.draw_text_layout(
+                self.layout.severity,
+                typeStr,
+                fillColor=(255,195,12)
+            )
+        else:
+            self.matrix.draw_text_layout(
+                self.layout.severity,
+                self.severity,
+                fillColor=(255,195,12),
+            )
 
     def draw_hashtag(self):
         hashtag_dots = [
