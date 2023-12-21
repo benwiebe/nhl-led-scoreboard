@@ -160,5 +160,7 @@ src/renderer/boarddev
 # Custom_logos to overwrite the standard one
 config/custom_logos.json
 
+nhl-api-client/
+
 # Customized systemd service file
 scripts/systemd/nhl-led-scoreboard.service
